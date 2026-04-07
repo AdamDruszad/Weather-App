@@ -1,0 +1,172 @@
+body {
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+  background-color: hsl(20%, 45%, 95%);
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: background 1s ease;
+  background: url("./pictures/deafult.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.text {
+  font-weight: 20px;
+  color: white;
+  margin-bottom: 30px;
+}
+
+.material-symbols-outlined {
+  color: white;
+  scale: 2.5;
+  margin-bottom: 50px;
+}
+
+/*1. Napos*/
+body.sunny {
+  background: url("./pictures/sunny.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* 2. Felhős */
+body.cloudy {
+  background: url("./pictures/cloudy.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* 3. Esős / Viharos */
+body.rainy {
+  background: url("./pictures/rainy.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* 4. Havas */
+body.snowy {
+  background: url("./pictures/snowy.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+body.foggy {
+  background: url("./pictures/foggy.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* 5. Miden más (pl. alap) */
+body.default {
+  background: url("./pictures/deafult.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.weatherForm {
+  margin: 30px;
+}
+
+.cityInput {
+  background-color: hsla(0, 0%, 100%, 0.54);
+  padding: 10px;
+  font-size: 2rem;
+  font-weight: bold;
+  border: 2px solid hsla(0, 0%, 20%, 0.3);
+  border-radius: 10px;
+  margin: 10px;
+  width: 300px;
+  transition: all 0.5s;
+}
+
+.cityInput:hover {
+  transform: scale(1.02);
+}
+
+button[type="submit"] {
+  padding: 10px 23px;
+  font-weight: bold;
+  font-size: 2rem;
+  background-color: hsla(186, 71%, 25%, 0.649);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.5s;
+}
+
+button[type="submit"]:hover {
+  background-color: hsla(186, 70%, 18%, 0.649);
+  transform: scale(1.02);
+}
+
+.card {
+  margin-top: 60px;
+  background: linear-gradient(180deg, hsla(208, 100%, 51%, 0.3), white);
+  padding: 20px;
+  border-radius: 10px;
+  min-width: 300px;
+  min-height: 450px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 2px 2px 5px black;
+  transition: all 0.2s ease-in-out;
+}
+
+.card:hover {
+  cursor: pointer;
+  transform: scale(1.02);
+  box-shadow: 5px 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+h1 {
+  font-size: 3.5rem;
+  margin-top: 0;
+  margin-bottom: 25px;
+}
+
+p {
+  font-size: 1.5rem;
+  margin: 5px 0;
+}
+
+.cityDisplay,
+.tempDisplay {
+  font-size: 3.5rem;
+  font-weight: bold;
+  color: hsla(0, 0%, 0%, 0.75);
+  margin-bottom: 25px;
+}
+
+.humindtyDisplay {
+  font-weight: bold;
+  margin-bottom: 25px;
+}
+
+.descDisplay {
+  font-style: italic;
+  font-weight: bold;
+  font-size: 2rem;
+}
+
+.weatherEmoji {
+  margin: 0;
+  font-size: 7.5rem;
+}
+
+.errorDisplay {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: rgba(0, 0, 0, 0.75);
+}
