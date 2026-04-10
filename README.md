@@ -1,2 +1,2 @@
 # Weather-App
-A wheater data query weba pplication
+A wheater data query web application
