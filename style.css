@@ -1,3 +1,15 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
 body {
   min-height: 100vh;
   font-family: Arial, sans-serif;
@@ -12,12 +24,16 @@ body {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 
 .text {
-  font-weight: 20px;
+  font-size: 30px;
+  font-weight: bold;
   color: white;
   margin-bottom: 30px;
+  text-align: center;
+  padding: 0 20px;
 }
 
 .material-symbols-outlined {
@@ -169,4 +185,44 @@ p {
   font-size: 2.5rem;
   font-weight: bold;
   color: rgba(0, 0, 0, 0.75);
+}
+
+@media screen and (max-width: 768px) {
+  .weatherForm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin: 20px 10px;
+  }
+  .cityInput,
+  button[type="submit"] {
+    width: 100%;
+    min-width: 300px;
+    margin: 0;
+    font-size: 1.5rem;
+  }
+  .card {
+    min-width: 90%;
+    margin-top: 30px;
+    padding: 15px;
+    min-height: auto;
+  }
+  h1,
+  .cityDisplay,
+  .tempDisplay {
+    font-size: 2.2rem;
+  }
+  .descDisplay,
+  .errorDisplay {
+    font-size: 1.5rem;
+  }
+
+  .weatherEmoji {
+    font-size: 5rem;
+  }
+
+  body {
+    padding: 15px;
+  }
 }
