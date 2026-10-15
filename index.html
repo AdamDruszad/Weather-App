@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="color-scheme" content="dark light" />
-  <meta name="theme-color" content="#08111a" />
+  <meta name="theme-color" content="#1c3350" />
   <meta name="description" content="A considered little weather app. Find current conditions, temperature, humidity and wind for cities around the world." />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Weather — A clearer view of your day" />
@@ -34,7 +34,7 @@
     <symbol id="rain" viewBox="0 0 48 48"><use href="#cloud-shape" transform="translate(0 -4)"/><path fill="none" stroke="currentColor" stroke-width="3" d="m17 35-4 8m13-8-4 8m13-8-4 8"/></symbol>
     <symbol id="storm" viewBox="0 0 48 48"><use href="#cloud-shape" transform="translate(0 -4)"/><path d="M27 32.5 20 40.5h5L22 47l9-10h-5l3.5-4.5Z"/></symbol>
     <symbol id="snow" viewBox="0 0 48 48"><use href="#cloud-shape" transform="translate(0 -4)"/><circle cx="15" cy="37" r="2.25"/><circle cx="24" cy="37" r="2.25"/><circle cx="33" cy="37" r="2.25"/><circle cx="19.5" cy="44" r="2.25"/><circle cx="28.5" cy="44" r="2.25"/></symbol>
-    <symbol id="mist" viewBox="0 0 48 48"><path d="M6 12.5h30V16H6zm6 9.75h30v3.5H12zM6 32h30v3.5H6z"/></symbol>
+    <symbol id="mist" viewBox="0 0 48 48"><use href="#cloud-shape" transform="translate(0 -6)"/><path d="M5 32h21v3.5H5zm25 0h13v3.5H30zM9 40h10v3.5H9zm14 0h20v3.5H23z"/></symbol>
     <symbol id="arrow-up" viewBox="0 0 24 24"><path d="m12 3 6.5 8H14v10h-4V11H5.5Z"/></symbol>
     <!-- Interface icons: 24-unit grid, 2-unit outline. -->
     <symbol id="arrow" viewBox="0 0 24 24"><path d="M4 12h15m-6-6 6 6-6 6"/></symbol>
@@ -95,11 +95,7 @@
     <div class="readout">
       <section id="weather" class="results" aria-label="Weather overview" aria-busy="false">
         <article class="plate weather-stage" data-weather="default">
-          <div class="plate-top">
-            <span class="plate-label">Current conditions</span>
-            <span class="stale-tag">Previous result</span>
-            <span id="weather-state-label" class="state-label">Your world, at a glance</span>
-          </div>
+          <span class="stale-tag">Previous result</span>
 
           <div id="empty-state" class="empty-state">
             <p class="empty-title">A new place.<br /><span>A new perspective.</span></p>
@@ -128,7 +124,7 @@
           </div>
 
           <div class="plate-foot">
-            <span id="observation-time">The sky has a story. Find yours.</span>
+            <p class="plate-caption"><span class="plate-label">Current conditions</span> <span id="weather-state-label" class="state-label">Your world, at a glance</span> <span id="observation-time">The sky has a story. Find yours.</span></p>
             <button id="refresh-button" class="refresh" type="button" hidden><svg class="icon" aria-hidden="true"><use href="#refresh"/></svg>Refresh weather</button>
           </div>
         </article>

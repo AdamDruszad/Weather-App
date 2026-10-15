@@ -7,7 +7,7 @@ const plate = document.querySelector(".plate");
 const codeBar = document.querySelector(".code-bar");
 const refreshButton = document.getElementById("refresh-button");
 // Mirrors --band in style.css so the browser chrome matches the header band.
-const THEME_COLORS = { dark: "#08111a", light: "#14263a" };
+const THEME_COLORS = { dark: "#1c3350", light: "#14263a" };
 const COMPASS = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
 let currentWeather = null;
 let lastCity = "";

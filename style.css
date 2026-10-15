@@ -50,10 +50,10 @@
   --ink-2: #9db0c1;
   --rule: #24364a;
   --control: #62798f;
-  --band: #08111a;
+  --band: #1c3350;
   --band-ink: #f2f6f9;
-  --band-ink-2: #8ea3b6;
-  --band-control: #50657a;
+  --band-ink-2: #a9bccd;
+  --band-control: #7089a3;
   --primary: #e6edf3;
   --on-primary: #0d1721;
   --primary-hover: #ffffff;
@@ -354,8 +354,8 @@ h1 {
   --plate-ink-2: var(--ink-2);
   --plate-rule: var(--rule);
   position: relative;
-  display: grid;
-  grid-template-rows: auto 1fr auto;
+  display: flex;
+  flex-direction: column;
   gap: var(--s-5);
   min-height: 27rem;
   padding: var(--s-5) var(--s-6);
@@ -374,6 +374,7 @@ h1 {
 .plate[data-weather="snowy"] {
   --plate-ink-2: color-mix(in srgb, var(--plate-ink) 80%, var(--plate-bg));
   --plate-rule: color-mix(in srgb, var(--plate-ink) 22%, transparent);
+  border-color: color-mix(in srgb, var(--plate-ink) 45%, transparent);
 }
 .plate[data-weather="rainy"],
 .plate[data-weather="stormy"],
@@ -389,31 +390,36 @@ h1 {
 .plate[data-weather="snowy"] { --plate-bg: var(--code-snowy); --plate-ink: var(--on-snowy); }
 .plate[data-weather="clear-night"] { --plate-bg: var(--code-clear-night); --plate-ink: var(--on-clear-night); }
 
-.plate-top,
-.plate-foot {
-  display: flex;
-  align-items: center;
-  gap: var(--s-3);
-  font-size: var(--fs-label);
-  font-stretch: 87.5%;
-}
-.plate-label { font-weight: 700; }
-.state-label { margin-left: auto; color: var(--plate-ink-2); font-weight: 500; text-align: right; }
+.empty-state, .result { flex: 1; }
 .stale-tag {
   display: none;
+  align-self: flex-start;
   padding: 0.125rem var(--s-2);
   border-radius: var(--radius);
   background: var(--plate-ink);
   color: var(--plate-bg);
+  font-size: var(--fs-label);
   font-weight: 700;
+  font-stretch: 87.5%;
 }
+/* The caption under the reading, like a sign's legend strip:
+   what this is, which condition group, when it was observed. */
 .plate-foot {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
   min-height: var(--target);
   padding-top: var(--s-3);
   border-top: 1px solid var(--plate-rule);
   color: var(--plate-ink-2);
   font-size: var(--fs-small);
+  font-stretch: 87.5%;
 }
+.plate-caption { min-width: 0; line-height: 1.4; }
+.plate-label { color: var(--plate-ink); font-weight: 700; }
+.state-label { color: var(--plate-ink); font-weight: 500; }
+.state-label::before { content: "· "; }
+#observation-time { display: block; }
 .refresh {
   display: inline-flex;
   align-items: center;
@@ -438,14 +444,12 @@ h1 {
 .empty-title { font-size: var(--fs-city); font-weight: 700; line-height: 1.15; letter-spacing: -0.02em; }
 .empty-title span { color: var(--ink-2); font-weight: 400; }
 .empty-copy { max-width: 40ch; color: var(--ink-2); }
+/* One row, like a legend strip: every code at the same scale. */
 .key {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--s-3) var(--s-2);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: var(--s-2) 0.375rem;
   margin-top: var(--s-4);
-}
-@container (min-width: 36rem) {
-  .key { grid-template-columns: repeat(7, minmax(0, 1fr)); }
 }
 .key li {
   display: grid;
@@ -503,14 +507,14 @@ h1 {
 .temperature {
   grid-area: temperature;
   font-size: var(--fs-temp);
-  font-weight: 300;
-  font-stretch: 87.5%;
+  font-weight: 560;
+  font-stretch: 75%;
   font-variant-numeric: tabular-nums;
   line-height: 0.9;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.03em;
 }
-.temperature span { margin-left: 0.04em; font-size: 0.375em; font-weight: 500; letter-spacing: 0; vertical-align: 0.95em; }
-.condition-picto { grid-area: picto; width: clamp(6rem, 32cqi, 10rem); height: auto; aspect-ratio: 1; margin-bottom: -0.25rem; }
+.temperature span { margin-left: 0.04em; font-size: 0.375em; font-weight: 600; font-stretch: 87.5%; letter-spacing: 0; vertical-align: 0.95em; }
+.condition-picto { grid-area: picto; width: clamp(6.5rem, 44cqi, 10rem); height: auto; aspect-ratio: 1; margin-bottom: -0.25rem; }
 .description { grid-area: description; margin-top: var(--s-3); font-size: var(--fs-lede); font-weight: 600; }
 .description::first-letter { text-transform: uppercase; }
 .range {
@@ -541,17 +545,19 @@ h1 {
 #weather[aria-busy="true"] .plate::before {
   content: "";
   position: absolute;
-  inset: 0 auto auto 0;
-  width: 35%;
+  inset: 0 0 auto 0;
   height: 3px;
   background: var(--plate-ink);
-  animation: progress 1.2s var(--ease-out) infinite;
+  transform-origin: left;
+  transform: scaleX(0.9);
+  animation: progress 8s cubic-bezier(0.08, 0.8, 0.2, 1) both;
 }
 #weather[aria-busy="true"] :is(.result, .metric .value) { opacity: 0.45; }
 .result, .metric .value { transition: opacity 0.2s; }
+/* One pass that slows toward 90%: the request is still going, nothing loops. */
 @keyframes progress {
-  from { transform: translateX(-100%); }
-  to { transform: translateX(290%); }
+  from { transform: scaleX(0); }
+  to { transform: scaleX(0.9); }
 }
 
 /* A failed newer search: the old result is marked, never silently kept. */
@@ -582,20 +588,19 @@ h1 {
   border-radius: var(--radius);
   background: var(--rule);
 }
-@container (min-width: 20rem) {
-  .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-@container (min-width: 40rem) {
-  .metrics { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-}
+/* Narrow column: each metric is a timetable row, label left and value right. */
 .metric {
   display: grid;
-  align-content: start;
-  gap: var(--s-1);
-  padding: var(--s-4) var(--s-5);
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: "label value" "hint value";
+  align-content: center;
+  align-items: center;
+  gap: var(--s-1) var(--s-3);
+  padding: var(--s-3) var(--s-4);
   background: var(--panel);
 }
 .metric dt {
+  grid-area: label;
   display: flex;
   align-items: center;
   gap: var(--s-2);
@@ -606,16 +611,32 @@ h1 {
 }
 .metric dt .icon { width: 1.125rem; height: 1.125rem; }
 .metric .value {
-  margin-top: var(--s-2);
-  font-size: var(--fs-metric);
-  font-weight: 500;
-  font-stretch: 87.5%;
+  grid-area: value;
+  font-size: 1.75rem;
+  font-weight: 560;
+  font-stretch: 75%;
   font-variant-numeric: tabular-nums;
   line-height: 1.1;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
+  text-align: right;
+  white-space: nowrap;
 }
-.metric .value small { margin-left: 0.15em; color: var(--ink-2); font-size: 0.5em; font-weight: 500; letter-spacing: 0; }
-.metric .hint { display: flex; align-items: center; gap: var(--s-1); color: var(--ink-2); font-size: var(--fs-small); line-height: 1.35; }
+.metric .value small { margin-left: 0.15em; color: var(--ink-2); font-size: 0.5em; font-weight: 500; font-stretch: 87.5%; letter-spacing: 0; }
+.metric .hint { grid-area: hint; display: flex; align-items: center; gap: var(--s-1); color: var(--ink-2); font-size: var(--fs-small); line-height: 1.35; }
+/* Wider column: cells stack label, value, hint, two or four across. */
+@container (min-width: 20rem) {
+  .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .metric {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "label" "value" "hint";
+    align-content: start;
+    padding: var(--s-4) var(--s-5);
+  }
+  .metric .value { margin-top: var(--s-1); font-size: var(--fs-metric); text-align: left; }
+}
+@container (min-width: 40rem) {
+  .metrics { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
 .wind-arrow {
   width: 1.125rem;
   height: 1.125rem;
@@ -671,7 +692,7 @@ h1 {
   .intro { gap: var(--s-4); }
   .lede { font-size: var(--fs-body); }
   .results { grid-template-columns: minmax(0, 1fr); gap: var(--s-6); }
-  .plate { min-height: 0; gap: var(--s-4); padding: var(--s-4); }
+  .plate { min-height: 22rem; gap: var(--s-4); padding: var(--s-4); }
   .empty-state { padding-block: var(--s-2); }
   .result { column-gap: var(--s-3); }
   .metric { padding: var(--s-3) var(--s-4) var(--s-4); }
