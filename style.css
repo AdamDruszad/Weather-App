@@ -243,7 +243,9 @@ main:focus { outline: none; }
 }
 
 /* ---------- Intro + search ---------- */
-.intro { display: grid; gap: var(--s-5); }
+/* Explicit shrinkable columns: an implicit grid column sizes to its content's minimum width,
+   and the search input's built-in ~20-character width would push the field off narrow screens. */
+.intro { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s-5); }
 h1 {
   font-size: var(--fs-h1);
   font-weight: 700;
@@ -253,7 +255,7 @@ h1 {
 }
 .lede { max-width: 34ch; color: var(--ink-2); font-size: var(--fs-lede); line-height: 1.45; }
 
-.search { display: grid; gap: var(--s-2); margin-top: var(--s-2); }
+.search { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s-2); margin-top: var(--s-2); }
 .field-label { font-size: var(--fs-small); font-weight: 600; }
 .field {
   display: flex;
