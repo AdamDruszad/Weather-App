@@ -1,8 +1,14 @@
-const weatherForm = document.querySelector(".weatherForm");
-const cityInput = document.querySelector(".cityInput");
+const weatherForm = document.querySelector("form.search");
+const cityInput = document.getElementById("city");
 const status = document.getElementById("search-status");
 const searchButton = document.getElementById("search-button");
 const weatherSection = document.getElementById("weather");
+const plate = document.querySelector(".plate");
+const codeBar = document.querySelector(".code-bar");
+const refreshButton = document.getElementById("refresh-button");
+// Mirrors --band in style.css so the browser chrome matches the header band.
+const THEME_COLORS = { dark: "#08111a", light: "#14263a" };
+const COMPASS = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
 let currentWeather = null;
 let lastCity = "";
 let controller = null;
@@ -15,6 +21,7 @@ function readPreference(key) {
 function savePreference(key, value) {
   try { localStorage.setItem(key, value); } catch { /* Settings are optional. */ }
 }
+
 function updateTheme(theme) {
   document.documentElement.dataset.theme = theme;
   const label = `Switch to ${theme === "dark" ? "light" : "dark"} mode`;
@@ -22,14 +29,19 @@ function updateTheme(theme) {
   button.setAttribute("aria-label", label);
   button.title = label;
   document.getElementById("theme-icon").setAttribute("href", theme === "dark" ? "#sun" : "#moon");
-  document.querySelector('meta[name="theme-color"]').content = theme === "dark" ? "#181c17" : "#f5f4ef";
+  document.querySelector('meta[name="theme-color"]').content = THEME_COLORS[theme];
 }
-updateTheme(document.documentElement.dataset.theme);
+updateTheme(document.documentElement.dataset.theme === "light" ? "light" : "dark");
 document.getElementById("theme-toggle").addEventListener("click", () => {
   const theme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
   updateTheme(theme);
   savePreference("weather-theme", theme);
 });
+// Follow the OS colour scheme until the visitor picks a theme themselves.
+window.matchMedia?.("(prefers-color-scheme: light)").addEventListener?.("change", event => {
+  if (!readPreference("weather-theme")) updateTheme(event.matches ? "light" : "dark");
+});
+
 function updateUnitButtons() {
   document.querySelectorAll("[data-unit]").forEach(button => button.setAttribute("aria-pressed", String(button.dataset.unit === unit)));
 }
@@ -40,21 +52,22 @@ document.querySelectorAll("[data-unit]").forEach(button => button.addEventListen
   updateUnitButtons();
   if (currentWeather) displayWeatherInfo(currentWeather);
 }));
+
 weatherForm.addEventListener("submit", event => {
   event.preventDefault();
-  searchWeather(cityInput.value);
+  searchWeather(cityInput.value, { reveal: true });
 });
 document.querySelectorAll("[data-city]").forEach(button => button.addEventListener("click", () => {
   cityInput.value = button.dataset.city.split(",")[0];
-  searchWeather(button.dataset.city);
+  searchWeather(button.dataset.city, { reveal: true });
 }));
-document.getElementById("refresh-button").addEventListener("click", () => searchWeather(lastCity));
+refreshButton.addEventListener("click", () => searchWeather(lastCity));
 cityInput.addEventListener("input", () => {
   cityInput.removeAttribute("aria-invalid");
   if (status.classList.contains("is-error")) { status.textContent = ""; status.classList.remove("is-error"); }
 });
 
-async function searchWeather(value) {
+async function searchWeather(value, { reveal = false } = {}) {
   const city = value.trim();
   if (!city) {
     showError("Enter a city name to find its weather.");
@@ -87,9 +100,11 @@ async function searchWeather(value) {
     }
     currentWeather = weatherData;
     lastCity = city;
+    delete weatherSection.dataset.stale;
     displayWeatherInfo(weatherData);
     status.textContent = `Current weather loaded for ${weatherData.name}.`;
-    document.getElementById("refresh-button").hidden = false;
+    refreshButton.hidden = false;
+    if (reveal) revealResult();
   } catch (error) {
     if (thisRequest !== requestId) return;
     const message = error.name === "AbortError"
@@ -97,6 +112,7 @@ async function searchWeather(value) {
       : error instanceof TypeError
         ? "Couldn't connect to the weather service. Check your connection and try again."
         : error.message;
+    if (currentWeather) weatherSection.dataset.stale = "true";
     showError(message + (currentWeather ? " Previous results are still shown below." : ""));
   } finally {
     clearTimeout(timeout);
@@ -107,6 +123,7 @@ async function searchWeather(value) {
     }
   }
 }
+
 async function getWeatherData(city, signal) {
   const url = new URL("./api/weather", document.baseURI);
   url.searchParams.set("q", city);
@@ -125,9 +142,12 @@ async function getWeatherData(city, signal) {
   if (!response.ok) throw new Error("The weather service is unavailable right now. Please try again shortly.");
   return data;
 }
+
+function toUnit(celsius) {
+  return unit === "f" ? celsius * 9 / 5 + 32 : celsius;
+}
 function temperature(value) {
-  if (!Number.isFinite(value)) return "—";
-  return `${Math.round(unit === "f" ? value * 9 / 5 + 32 : value)}°${unit.toUpperCase()}`;
+  return Number.isFinite(value) ? `${Math.round(toUnit(value))}°${unit.toUpperCase()}` : "—";
 }
 function showMetric(id, value, suffix = "") {
   const element = document.getElementById(id);
@@ -138,52 +158,74 @@ function showMetric(id, value, suffix = "") {
     element.append(small);
   }
 }
+
+// One table maps an OpenWeather condition id to its colour code and pictogram.
+function classify(id, icon = "") {
+  const night = icon.endsWith("n");
+  if (id === 800) return night ? { code: "clear-night", picto: "#moon" } : { code: "sunny", picto: "#sun" };
+  if (id >= 200 && id < 300) return { code: "stormy", picto: "#storm" };
+  if (id >= 300 && id < 600) return { code: "rainy", picto: "#rain" };
+  if (id >= 600 && id < 700) return { code: "snowy", picto: "#snow" };
+  if (id >= 700 && id < 800) return { code: "foggy", picto: "#mist" };
+  if (id === 801 || id === 802) return { code: "cloudy", picto: night ? "#moon-cloud" : "#sun-cloud" };
+  if (id > 802 && id < 810) return { code: "cloudy", picto: "#cloud" };
+  return { code: "default", picto: "#cloud" };
+}
+
 function displayWeatherInfo(data) {
   const condition = data.weather[0];
+  const { temp, temp_min: low, temp_max: high, feels_like: feelsLike, humidity } = data.main;
   document.getElementById("empty-state").hidden = true;
   document.getElementById("weather-result").hidden = false;
   document.getElementById("city-name").textContent = data.name;
   document.getElementById("country").textContent = data.sys?.country || "";
+
   const tempElement = document.getElementById("temperature");
-  tempElement.textContent = Math.round(unit === "f" ? data.main.temp * 9 / 5 + 32 : data.main.temp);
+  tempElement.textContent = Math.round(toUnit(temp));
   const unitLabel = document.createElement("span");
   unitLabel.textContent = `°${unit.toUpperCase()}`;
   tempElement.append(unitLabel);
   document.getElementById("description").textContent = condition.description;
-  document.getElementById("temp-low").textContent = temperature(data.main.temp_min);
-  document.getElementById("temp-high").textContent = temperature(data.main.temp_max);
-  document.getElementById("feels-like").textContent = temperature(data.main.feels_like);
-  showMetric("humidity", Number.isFinite(data.main.humidity) ? data.main.humidity : "—", "%");
+  document.getElementById("temp-low").textContent = temperature(low);
+  document.getElementById("temp-high").textContent = temperature(high);
+  const track = document.getElementById("range-track");
+  const hasRange = Number.isFinite(low) && Number.isFinite(high) && high >= low;
+  track.hidden = !hasRange;
+  if (hasRange) track.style.setProperty("--at", `${high > low ? Math.min(Math.max((temp - low) / (high - low), 0), 1) * 100 : 50}%`);
+
+  document.getElementById("feels-like").textContent = temperature(feelsLike);
+  showMetric("humidity", Number.isFinite(humidity) ? humidity : "—", "%");
   const wind = Number.isFinite(data.wind?.speed) ? (unit === "f" ? data.wind.speed * 2.23694 : data.wind.speed * 3.6).toFixed(1) : "—";
   showMetric("wind-speed", wind, unit === "f" ? "mph" : "km/h");
-  const directions = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
-  document.getElementById("wind-direction").textContent = Number.isFinite(data.wind?.deg) ? `From the ${directions[Math.round(data.wind.deg / 45) % 8]}` : "At ground level";
+  const deg = data.wind?.deg;
+  const windArrow = document.getElementById("wind-arrow");
+  windArrow.toggleAttribute("hidden", !Number.isFinite(deg));
+  // The arrow points where the wind blows to; the text names where it comes from.
+  if (Number.isFinite(deg)) windArrow.style.setProperty("--deg", `${deg + 180}deg`);
+  document.getElementById("wind-direction").textContent = Number.isFinite(deg) ? `From the ${COMPASS[Math.round(deg / 45) % 8]}` : "At ground level";
   const visibility = Number.isFinite(data.visibility) ? (data.visibility / (unit === "f" ? 1609.344 : 1000)).toFixed(1) : "—";
   showMetric("visibility", visibility, unit === "f" ? "mi" : "km");
-  document.getElementById("condition-icon").setAttribute("href", getConditionIcon(condition.id, condition.icon));
-  document.querySelector(".weather-stage").dataset.weather = getBackground(condition.id);
-  document.getElementById("weather-state-label").textContent = condition.main.toUpperCase();
-  document.getElementById("details-label").textContent = "CURRENT OBSERVATIONS";
+
+  const { code, picto } = classify(condition.id, condition.icon);
+  document.getElementById("condition-icon").setAttribute("href", picto);
+  plate.dataset.weather = code;
+  codeBar.dataset.active = code;
+  document.getElementById("weather-state-label").textContent = condition.main;
+  document.getElementById("details-label").textContent = "Current observations";
   const date = new Date(Number.isFinite(data.dt) ? (data.dt + (Number.isFinite(data.timezone) ? data.timezone : 0)) * 1000 : NaN);
   const time = Number.isFinite(date.getTime()) ? new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "UTC" }).format(date) : null;
-  document.getElementById("observation-time").textContent = time ? `OBSERVED AT ${time} · CITY LOCAL TIME` : "CURRENT WEATHER OBSERVATION";
+  document.getElementById("observation-time").textContent = time ? `Observed at ${time} · city local time` : "Current weather observation";
 }
+
+// On phones the result sits below the search; bring it into view once it arrives.
+function revealResult() {
+  if (!window.matchMedia?.("(max-width: 767px)").matches || typeof plate.scrollIntoView !== "function") return;
+  if (plate.getBoundingClientRect().top < window.innerHeight * 0.4) return;
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  plate.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+}
+
 function showError(message) {
   status.textContent = message;
   status.classList.add("is-error");
-}
-function getBackground(id) {
-  if (id === 800) return "sunny";
-  if (id >= 200 && id < 600) return "rainy";
-  if (id >= 600 && id < 700) return "snowy";
-  if (id >= 700 && id < 800) return "foggy";
-  if (id > 800 && id < 810) return "cloudy";
-  return "default";
-}
-function getConditionIcon(id, icon = "") {
-  if (id === 800) return icon.endsWith("n") ? "#moon" : "#sun";
-  if (id >= 200 && id < 600) return "#rain";
-  if (id >= 600 && id < 700) return "#snow";
-  if (id >= 700 && id < 800) return "#mist";
-  return "#cloud";
 }

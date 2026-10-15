@@ -3,78 +3,161 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#181c17" />
+  <meta name="color-scheme" content="dark light" />
+  <meta name="theme-color" content="#08111a" />
   <meta name="description" content="A considered little weather app. Find current conditions, temperature, humidity and wind for cities around the world." />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Weather — A clearer view of your day" />
+  <meta property="og:description" content="A considered little weather app. Find current conditions, temperature, humidity and wind for cities around the world." />
+  <meta name="twitter:card" content="summary" />
   <title>Weather — A clearer view of your day</title>
-  <script>try { document.documentElement.dataset.theme = localStorage.getItem("weather-theme") === "light" ? "light" : "dark"; } catch {}</script>
+  <script>try { const saved = localStorage.getItem("weather-theme"); document.documentElement.dataset.theme = saved === "light" || saved === "dark" ? saved : matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark"; } catch {}</script>
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <svg class="icon-definitions" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <symbol id="sun" viewBox="0 0 48 48"><circle cx="24" cy="24" r="10"/><path d="M24 2v5m0 34v5M2 24h5m34 0h5M8.5 8.5l3.5 3.5m24 24 3.5 3.5m-31 0 3.5-3.5m24-24 3.5-3.5"/></symbol>
-    <symbol id="cloud" viewBox="0 0 48 48"><path d="M14 36h24a8 8 0 0 0 0-16h-1a13 13 0 0 0-25-3 10 10 0 0 0 2 19Z"/></symbol>
-    <symbol id="rain" viewBox="0 0 48 48"><path d="M11 28a8 8 0 0 1 0-16 12 12 0 0 1 23 1 8 8 0 0 1 3 15H11Zm3 8-2 5m12-5-2 5m12-5-2 5"/></symbol>
-    <symbol id="snow" viewBox="0 0 48 48"><path d="M24 4v40M7 14l34 20M7 34l34-20M18 7l6 6 6-6M18 41l6-6 6 6M6 21l9-2-2-9m22 28-2-9 9-2M6 27l9 2-2 9m22-28-2 9 9 2"/></symbol>
-    <symbol id="mist" viewBox="0 0 48 48"><path d="M5 15h30M13 24h30M5 33h30"/></symbol>
-    <symbol id="moon" viewBox="0 0 48 48"><path d="M41 28A18 18 0 0 1 20 7a18 18 0 1 0 21 21Z"/></symbol>
-    <symbol id="arrow" viewBox="0 0 24 24"><path d="M5 19 19 5H5m14 0v14"/></symbol>
-    <symbol id="search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></symbol>
-    <symbol id="pin" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+  <svg class="sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+    <defs>
+      <!-- Pictograms: solid shapes on a 48-unit grid, 3-unit butt-capped strokes. -->
+      <g id="cloud-shape"><circle cx="25" cy="21" r="11"/><circle cx="13" cy="27" r="7"/><circle cx="35" cy="27" r="7"/><rect x="13" y="26" width="22" height="8"/></g>
+      <path id="crescent" d="M22.03 9.03A16 16 0 1 0 38.78 27.64 13 13 0 0 1 22.03 9.03Z"/>
+      <mask id="behind-cloud" maskUnits="userSpaceOnUse" x="0" y="0" width="48" height="48"><rect width="48" height="48" fill="#fff"/><use href="#cloud-shape" transform="translate(-4 8)" fill="#000" stroke="#000" stroke-width="5"/></mask>
+    </defs>
+    <symbol id="sun" viewBox="0 0 48 48"><circle cx="24" cy="24" r="8.5"/><path fill="none" stroke="currentColor" stroke-width="3" d="M24 5v6.5m0 25V43M5 24h6.5m25 0H43M15.16 15.16l-4.6-4.6m22.28 0 4.6-4.6M15.16 32.84l-4.6 4.6m22.28 0 4.6 4.6"/></symbol>
+    <symbol id="moon" viewBox="0 0 48 48"><use href="#crescent"/></symbol>
+    <symbol id="sun-cloud" viewBox="0 0 48 48"><g mask="url(#behind-cloud)"><circle cx="30" cy="15" r="6"/><path fill="none" stroke="currentColor" stroke-width="3" d="M30 6V1.5M39 15h4.5M36.36 8.64l3.19-3.19M23.64 8.64l-3.19-3.19M36.36 21.36l3.19 3.19M21 15h-4.5M30 24v4.5"/></g><use href="#cloud-shape" transform="translate(-4 8)"/></symbol>
+    <symbol id="moon-cloud" viewBox="0 0 48 48"><g mask="url(#behind-cloud)"><use href="#crescent" transform="translate(17 -4) scale(.7)"/></g><use href="#cloud-shape" transform="translate(-4 8)"/></symbol>
+    <symbol id="cloud" viewBox="0 0 48 48"><use href="#cloud-shape" transform="translate(0 2)"/></symbol>
+    <symbol id="rain" viewBox="0 0 48 48"><use href="#cloud-shape" transform="translate(0 -4)"/><path fill="none" stroke="currentColor" stroke-width="3" d="m17 35-4 8m13-8-4 8m13-8-4 8"/></symbol>
+    <symbol id="storm" viewBox="0 0 48 48"><use href="#cloud-shape" transform="translate(0 -4)"/><path d="M27 32.5 20 40.5h5L22 47l9-10h-5l3.5-4.5Z"/></symbol>
+    <symbol id="snow" viewBox="0 0 48 48"><use href="#cloud-shape" transform="translate(0 -4)"/><circle cx="15" cy="37" r="2.25"/><circle cx="24" cy="37" r="2.25"/><circle cx="33" cy="37" r="2.25"/><circle cx="19.5" cy="44" r="2.25"/><circle cx="28.5" cy="44" r="2.25"/></symbol>
+    <symbol id="mist" viewBox="0 0 48 48"><path d="M6 12.5h30V16H6zm6 9.75h30v3.5H12zM6 32h30v3.5H6z"/></symbol>
+    <symbol id="arrow-up" viewBox="0 0 24 24"><path d="m12 3 6.5 8H14v10h-4V11H5.5Z"/></symbol>
+    <!-- Interface icons: 24-unit grid, 2-unit outline. -->
+    <symbol id="arrow" viewBox="0 0 24 24"><path d="M4 12h15m-6-6 6 6-6 6"/></symbol>
+    <symbol id="search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5.5 5.5"/></symbol>
+    <symbol id="pin" viewBox="0 0 24 24"><path d="M12 21.5s-7-6.2-7-11.75a7 7 0 0 1 14 0c0 5.55-7 11.75-7 11.75Z"/><circle cx="12" cy="9.75" r="2.5"/></symbol>
     <symbol id="wind" viewBox="0 0 24 24"><path d="M3 8h12a3 3 0 1 0-3-3M3 12h16a3 3 0 1 1-3 3M3 16h5a3 3 0 1 1-3 3"/></symbol>
-    <symbol id="drop" viewBox="0 0 24 24"><path d="M12 2S5 10 5 15a7 7 0 0 0 14 0c0-5-7-13-7-13Z"/></symbol>
-    <symbol id="thermometer" viewBox="0 0 24 24"><path d="M9 14.5V5a3 3 0 0 1 6 0v9.5a5 5 0 1 1-6 0Z"/><path d="M12 8v10"/></symbol>
-    <symbol id="eye" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="drop" viewBox="0 0 24 24"><path d="M12 3s-6.5 7.2-6.5 11.5a6.5 6.5 0 0 0 13 0C18.5 10.2 12 3 12 3Z"/></symbol>
+    <symbol id="thermometer" viewBox="0 0 24 24"><path d="M10 14.6V5a2 2 0 0 1 4 0v9.6a4.5 4.5 0 1 1-4 0Z"/><path d="M12 9.5v8"/></symbol>
+    <symbol id="eye" viewBox="0 0 24 24"><path d="M2 12s3.8-7 10-7 10 7 10 7-3.8 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="refresh" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.34-5.66M20 3.5V9h-5.5"/></symbol>
+    <symbol id="external" viewBox="0 0 24 24"><path d="M14 4h6v6m0-6-9 9m7 1v6H4V6h6"/></symbol>
+    <symbol id="info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 10.5V17m0-10v2"/></symbol>
   </svg>
+
   <a class="skip-link" href="#main">Skip to weather search</a>
-  <header class="site-header shell">
-    <a class="brand" href="./"><svg class="icon"><use href="#sun"/></svg>weather<span>by a/d.</span></a>
-    <span class="header-note">A LITTLE PERSPECTIVE ON THE OUTSIDE.</span>
-    <button id="theme-toggle" class="icon-button" type="button" aria-label="Switch to light mode" title="Switch to light mode"><svg class="icon"><use id="theme-icon" href="#sun"/></svg></button>
+
+  <header class="band">
+    <div class="band-inner shell">
+      <a class="brand" href="./"><span class="brand-mark" aria-hidden="true"><svg class="picto"><use href="#sun"/></svg></span><span class="brand-name">weather</span> <span class="brand-by">by a/d.</span></a>
+      <p class="band-note">A little perspective on the outside.</p>
+      <div class="prefs">
+        <div class="units" role="group" aria-label="Temperature unit">
+          <button type="button" data-unit="c" aria-pressed="true" aria-label="Celsius">°C</button>
+          <button type="button" data-unit="f" aria-pressed="false" aria-label="Fahrenheit">°F</button>
+        </div>
+        <button id="theme-toggle" class="icon-button" type="button" aria-label="Switch to light mode" title="Switch to light mode"><svg class="picto" aria-hidden="true"><use id="theme-icon" href="#sun"/></svg></button>
+      </div>
+    </div>
+    <div class="code-bar" aria-hidden="true"><span data-code="sunny"></span><span data-code="cloudy"></span><span data-code="foggy"></span><span data-code="rainy"></span><span data-code="stormy"></span><span data-code="snowy"></span><span data-code="clear-night"></span></div>
   </header>
-  <main id="main" class="shell" tabindex="-1">
-    <section class="page-intro" aria-labelledby="page-title">
-      <div><p class="eyebrow">LOOK UP. STEP OUT.</p><h1 id="page-title">A clearer view<br />of <em>your day.</em></h1></div>
-      <p>Wherever you're headed,<br />start with the weather.</p>
-    </section>
-    <section class="search-section" aria-label="Find current weather">
-      <form class="weatherForm" novalidate>
-        <label for="city" class="sr-only">City name</label>
-        <svg class="icon" aria-hidden="true"><use href="#search"/></svg>
-        <input id="city" name="city" class="cityInput" type="search" placeholder="Search a city, anywhere…" autocomplete="off" maxlength="100" aria-describedby="search-help search-status" />
-        <button id="search-button" type="submit"><span>Find weather</span><svg class="icon" aria-hidden="true"><use href="#arrow"/></svg></button>
+
+  <main id="main" class="shell layout" tabindex="-1">
+    <section class="intro" aria-labelledby="page-title">
+      <h1 id="page-title">A clearer view of your day.</h1>
+      <p class="lede">Look up. Step out. Wherever you're headed, start with the weather.</p>
+
+      <form class="search" role="search" novalidate>
+        <label for="city" class="field-label">City name</label>
+        <div class="field">
+          <svg class="icon" aria-hidden="true"><use href="#search"/></svg>
+          <input id="city" name="city" type="search" placeholder="Search a city, anywhere…" autocomplete="off" spellcheck="false" enterkeyhint="search" maxlength="100" aria-describedby="search-help search-status" />
+          <button id="search-button" type="submit"><span>Find weather</span><svg class="icon" aria-hidden="true"><use href="#arrow"/></svg></button>
+        </div>
       </form>
-      <div class="search-meta"><p id="search-help">Try somewhere familiar</p><div class="quick-cities"><button type="button" data-city="Debrecen,HU">Debrecen <span>↗</span></button><button type="button" data-city="Budapest,HU">Budapest <span>↗</span></button><button type="button" data-city="London,GB">London <span>↗</span></button></div><div class="units" role="group" aria-label="Temperature unit"><button type="button" data-unit="c" aria-pressed="true" aria-label="Celsius">°C</button><button type="button" data-unit="f" aria-pressed="false" aria-label="Fahrenheit">°F</button></div></div>
+
+      <div class="familiar">
+        <p id="search-help">Try somewhere familiar</p>
+        <ul class="chips">
+          <li><button type="button" data-city="Debrecen,HU">Debrecen<span class="chip-code" aria-hidden="true">HU</span></button></li>
+          <li><button type="button" data-city="Budapest,HU">Budapest<span class="chip-code" aria-hidden="true">HU</span></button></li>
+          <li><button type="button" data-city="London,GB">London<span class="chip-code" aria-hidden="true">GB</span></button></li>
+        </ul>
+      </div>
+
       <p id="search-status" role="status" aria-live="polite" aria-atomic="true"></p>
     </section>
-    <section id="weather" class="weather-grid" aria-label="Weather overview" aria-busy="false">
-      <div class="weather-stage" data-weather="default">
-        <div class="weather-stage-top"><span class="eyebrow">CURRENT CONDITIONS</span><span id="weather-state-label">YOUR WORLD, AT A GLANCE</span></div>
-        <div id="empty-state" class="empty-state"><div><p>A new place.<br /><em>A new perspective.</em></p><span>Search for a city to see what's happening outside.</span></div><svg class="weather-art icon" aria-hidden="true"><use href="#sun"/></svg></div>
-        <div id="weather-result" hidden>
-          <div class="location-line"><svg class="icon" aria-hidden="true"><use href="#pin"/></svg><h2 id="city-name"></h2><span id="country"></span></div>
-          <div class="temperature-row"><p id="temperature"></p><svg class="weather-art icon" aria-hidden="true"><use id="condition-icon" href="#sun"/></svg></div>
-          <p id="description"></p>
-          <div class="temperature-range"><span>Low <b id="temp-low"></b></span><span>High <b id="temp-high"></b></span></div>
+
+    <div class="readout">
+      <section id="weather" class="results" aria-label="Weather overview" aria-busy="false">
+        <article class="plate weather-stage" data-weather="default">
+          <div class="plate-top">
+            <span class="plate-label">Current conditions</span>
+            <span class="stale-tag">Previous result</span>
+            <span id="weather-state-label" class="state-label">Your world, at a glance</span>
+          </div>
+
+          <div id="empty-state" class="empty-state">
+            <p class="empty-title">A new place.<br /><span>A new perspective.</span></p>
+            <p class="empty-copy">Search for a city to see what's happening outside.</p>
+            <ul class="key" aria-hidden="true">
+              <li data-code="sunny"><svg class="picto"><use href="#sun"/></svg>Clear</li>
+              <li data-code="cloudy"><svg class="picto"><use href="#cloud"/></svg>Clouds</li>
+              <li data-code="foggy"><svg class="picto"><use href="#mist"/></svg>Mist</li>
+              <li data-code="rainy"><svg class="picto"><use href="#rain"/></svg>Rain</li>
+              <li data-code="stormy"><svg class="picto"><use href="#storm"/></svg>Storm</li>
+              <li data-code="snowy"><svg class="picto"><use href="#snow"/></svg>Snow</li>
+              <li data-code="clear-night"><svg class="picto"><use href="#moon"/></svg>Clear night</li>
+            </ul>
+          </div>
+
+          <div id="weather-result" class="result" hidden>
+            <div class="location"><svg class="icon" aria-hidden="true"><use href="#pin"/></svg><h2 id="city-name"></h2><span id="country"></span></div>
+            <p id="temperature" class="temperature"></p>
+            <svg class="condition-picto picto" aria-hidden="true"><use id="condition-icon" href="#sun"/></svg>
+            <p id="description" class="description"></p>
+            <div class="range">
+              <span class="range-end">Low <b id="temp-low"></b></span>
+              <span id="range-track" class="range-track" aria-hidden="true"><span class="range-marker"></span></span>
+              <span class="range-end">High <b id="temp-high"></b></span>
+            </div>
+          </div>
+
+          <div class="plate-foot">
+            <span id="observation-time">The sky has a story. Find yours.</span>
+            <button id="refresh-button" class="refresh" type="button" hidden><svg class="icon" aria-hidden="true"><use href="#refresh"/></svg>Refresh weather</button>
+          </div>
+        </article>
+
+        <div class="weather-details">
+          <div class="details-heading"><h2>The finer details</h2><span id="details-label">Waiting for a city</span></div>
+          <dl class="metrics">
+            <div class="metric"><dt><svg class="icon" aria-hidden="true"><use href="#thermometer"/></svg>Feels like</dt><dd id="feels-like" class="value">—</dd><dd class="hint">How it feels outside</dd></div>
+            <div class="metric"><dt><svg class="icon" aria-hidden="true"><use href="#drop"/></svg>Humidity</dt><dd id="humidity" class="value">—</dd><dd class="hint">Moisture in the air</dd></div>
+            <div class="metric"><dt><svg class="icon" aria-hidden="true"><use href="#wind"/></svg>Wind speed</dt><dd id="wind-speed" class="value">—</dd><dd class="hint"><svg id="wind-arrow" class="wind-arrow picto" aria-hidden="true" hidden><use href="#arrow-up"/></svg><span id="wind-direction">At ground level</span></dd></div>
+            <div class="metric"><dt><svg class="icon" aria-hidden="true"><use href="#eye"/></svg>Visibility</dt><dd id="visibility" class="value">—</dd><dd class="hint">How far you can see</dd></div>
+          </dl>
         </div>
-        <div class="weather-stage-bottom"><span id="observation-time">THE SKY HAS A STORY. FIND YOURS.</span><svg class="icon" aria-hidden="true"><use href="#arrow"/></svg></div>
+      </section>
+
+      <div class="data-note">
+        <svg class="icon" aria-hidden="true"><use href="#info"/></svg>
+        <p><strong>A snapshot of right now.</strong> Current observations from OpenWeather. Conditions can change between updates.</p>
       </div>
-      <div class="weather-details">
-        <div class="details-heading"><h2>The finer details</h2><span id="details-label">WAITING FOR A CITY</span></div>
-        <dl class="metrics">
-          <div><dt><svg class="icon" aria-hidden="true"><use href="#thermometer"/></svg>Feels like</dt><dd id="feels-like">—</dd><p>How it feels outside</p></div>
-          <div><dt><svg class="icon" aria-hidden="true"><use href="#drop"/></svg>Humidity</dt><dd id="humidity">—</dd><p>Moisture in the air</p></div>
-          <div><dt><svg class="icon" aria-hidden="true"><use href="#wind"/></svg>Wind speed</dt><dd id="wind-speed">—</dd><p id="wind-direction">At ground level</p></div>
-          <div><dt><svg class="icon" aria-hidden="true"><use href="#eye"/></svg>Visibility</dt><dd id="visibility">—</dd><p>How far you can see</p></div>
-        </dl>
-      </div>
-    </section>
-    <div class="data-note"><span class="note-mark">↳</span><p>A snapshot of right now.<span>Current observations from OpenWeather. Conditions can change between updates.</span></p><button id="refresh-button" type="button" hidden>Refresh weather <span>↗</span></button></div>
+    </div>
   </main>
-  <footer class="site-footer shell"><span>Made for the everyday explorer.</span><div><a href="https://github.com/AdamDruszad/Weather-App" target="_blank" rel="noopener noreferrer">Source code ↗</a><a href="https://portfolio-orpin-eight-240etcohnd.vercel.app/" target="_blank" rel="noopener noreferrer">An Adam Biró project ↗</a></div></footer>
+
+  <footer class="site-footer shell">
+    <p>Made for the everyday explorer.</p>
+    <ul class="footer-links">
+      <li><a href="https://github.com/AdamDruszad/Weather-App" target="_blank" rel="noopener noreferrer">Source code<svg class="icon" aria-hidden="true"><use href="#external"/></svg><span class="sr-only"> (opens in a new tab)</span></a></li>
+      <li><a href="https://portfolio-orpin-eight-240etcohnd.vercel.app/" target="_blank" rel="noopener noreferrer">An Adam Biró project<svg class="icon" aria-hidden="true"><use href="#external"/></svg><span class="sr-only"> (opens in a new tab)</span></a></li>
+    </ul>
+  </footer>
   <script src="index.js"></script>
 </body>
 </html>
