@@ -8,6 +8,8 @@ Baseline screenshots: `docs/redesign-screenshots/before/` (kept out of git). The
 page at 390 and 1440 px plus 15 states per width in `before/states/`, driven with a mocked
 `/api/weather`.
 
+How this was verified: `../.claude/tools/weather-verify.mjs` drives the running page with a mocked `/api/weather` and checks 72 items (112 assertions) against the copy, attributes and behaviour listed here: **72/72 pass**. Items it doesn't exercise in the browser (M3 timeout, B1 request races, B2 malformed data, B9 blocked storage) are covered by `npm test` (16/16 pass). R2/R3: `git diff 04d4730 -- api scripts vercel.json package.json` is empty. States X1–X10 were checked in `docs/redesign-screenshots/after/states/`.
+
 Status key: ✅ present and working in the redesign · ♻️ present, deliberately reworked (see note)
 · ❌ missing
 
@@ -82,8 +84,8 @@ Status key: ✅ present and working in the redesign · ♻️ present, deliberat
 
 | # | Item | Verified |
 |---|------|----------|
-| C1 | Panel label "Current conditions" | ✅ |
-| C2 | State label: "Your world, at a glance" before a search, then the condition group (for example "Clear") | ✅ |
+| C1 | Panel label "Current conditions" | ♻️ moved from above the city name into the caption strip at the foot of the panel ("Current conditions · Clear") |
+| C2 | State label: "Your world, at a glance" before a search, then the condition group (for example "Clear") | ♻️ same text, now in the caption strip next to C1 |
 | C3 | Empty state: "A new place. A new perspective.", "Search for a city to see what's happening outside.", sun illustration | ♻️ copy kept; the single sun became a key of the condition pictograms |
 | C4 | Pin icon + city name (H2) + country code | ✅ |
 | C5 | Temperature, rounded, with a °C/°F unit | ✅ |

@@ -44,9 +44,15 @@ Locally, `.env.local` does not exist, so every live search returns 503 `SERVICE_
 | SEO basics | 5 | 6 |
 | Security (report only) | 5 | 5 (unchanged; see below) |
 
-The after scores are self-assessed from `docs/redesign-screenshots/after/` (17 states at 390 and
-1440 px, plus 1024 px spot checks), the passing `npm test` run and a keyboard walk. No
-independent design review or automated a11y scanner was run.
+The after scores are my own assessment. They rest on:
+
+- `docs/redesign-screenshots/after/`: 17 states at 390 and 1440 px, plus 1024 px spot checks
+- `npm test` (16/16)
+- an inventory script (72/72 items, 112 checks)
+- a keyboard walk
+- one independent finish review with a verdict pass (see the end of this file)
+
+No automated a11y scanner (axe) or Lighthouse run was done.
 
 ### Visual design & consistency: 5/10
 
@@ -187,7 +193,15 @@ panel takes the code colour of the current condition: clear orange, cloud silver
 rain blue, storm violet, snow ice or night blue. A seven-colour code bar under the navy header
 band widens the current condition's segment. Before a search, the panel shows the pictogram
 key, so the colour code teaches itself. There is one type family (Archivo, using its width
-axis), the minimum size is 13 px, and the temperature is set at 6 rem.
+axis), the minimum size is 13 px, and the temperature is set at 6 rem as a condensed semibold
+numeral. Like a sign, the panel puts the place at the top and the reading at the bottom. A
+caption strip underneath carries "Current conditions · {condition}", the observation time and
+Refresh.
+
+Why this direction: the old look matched a generic AI-generated cluster and said nothing about
+the weather. A wayfinding system is built to be read at a glance from a distance, which is
+exactly the job of a weather check, and its colour code makes clear, rain and snow look
+different before you read a word.
 
 What changed against the top 10:
 
@@ -196,9 +210,10 @@ What changed against the top 10:
    search.
 3. Desktop is three columns (search, plate, details) and fits one 1440×900 viewport. On phones
    the plate scrolls into view after a search.
-4. Control borders are at least 3:1 and every text pair at least 4.5:1. On the coloured plates,
-   text measures 5.4–12.6:1.
-5. Every target is at least 44 px.
+4. Control borders are at least 3:1 and every text colour token pair at least 4.5:1. On the
+   coloured plates, text measures 5.4–12.6:1.
+5. Every control is at least 40 px tall; buttons, chips and links are 44 px (the °C/°F
+   segments are 44×40 inside a 44 px group).
 6. Clean accessible names, valid `<dl>`, and new-tab links are announced.
 7. A failed search stamps "Previous result" and a dashed border on the old panel.
 8. Each condition looks distinct.
@@ -209,6 +224,31 @@ Constraints kept: same stack, no new static files, no new origins (Google Fonts 
 API and `scripts/dev.mjs` untouched. `tests/ui.test.js` changed only in three presentation
 assertions (sentence case, new `theme-color` values).
 
-Not done: no independent finish review, no generated DESIGN.md, and no automated axe or
-Lighthouse run. `pictures/*.png` (12.8 MB) stay in the repository unused. The owner can delete
-them.
+### Decisions taken without the owner's input
+
+The brief asked for autonomous work, so nobody was asked to confirm these:
+
+- **Product context.** PRODUCT.md was written from the code and README, with inferred lines
+  marked.
+- **Visual direction.** The design skill's direction roll assigned the direction. The skill
+  could not print or verify a seed reference for that roll, so it is not independently
+  reproducible.
+- **Desktop layout.** The first build placed the details below the panel in a two-column
+  layout. It became three columns (search | panel | details) after the first capture showed a
+  large empty left column, and the result fits one 1440×900 viewport. A gap of about 280 px still
+  remains below the search column at 1440 px.
+- **Photos.** The sky photos were retired in favour of colour plus pictogram.
+
+### Finish review
+
+An independent reviewer compared the build with the direction contract. It asked for 7 material
+fixes: the topology, a label above the heading, the seed reference, the dark-theme band, the
+pictogram scale, the mist glyph and an empty-to-loaded height jump. After one fix round, its
+verdict pass scored 6 of 7 resolved. The seed reference stays open because the tooling can't
+produce it.
+
+### Not done
+
+- No automated axe or Lighthouse run.
+- No social preview image or canonical URL, because the production URL isn't in the repository.
+- `pictures/*.png` (12.8 MB) stay in the repository unused. The owner can delete them.
